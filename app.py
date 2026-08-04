@@ -1,3 +1,4 @@
+
 import streamlit as st
 from datetime import datetime
 
@@ -29,6 +30,7 @@ st.divider()
 
 st.header("📜 Histórico de Designações")
 
+
 # Exemplo temporário simulando uma designação cadastrada
 # Depois será substituído pelo banco de dados
 
@@ -55,6 +57,7 @@ for item in historico:
 
     st.code(link)
 
+
     try:
         data_formatada = datetime.strptime(
             item[0],
@@ -65,31 +68,30 @@ for item in historico:
         data_formatada = item[0]
 
 
-    mensagem = f"""Olá, {item[1]}! 👋
-
-Você recebeu uma designação.
-
-📅 Data: {data_formatada}
-📝 Designação: {item[2]}
-
-Por favor, confirme o recebimento da designação e a disponibilidade em cumpri-la, acessando o link a seguir:
-
-🔗 {link}
-
-Muito obrigado!
-"""
+    mensagem = (
+        f"Olá, {item[1]}! 👋\n\n"
+        f"Você recebeu uma designação.\n\n"
+        f"📅 Data: {data_formatada}\n"
+        f"📝 Designação: {item[2]}\n\n"
+        f"Por favor, confirme o recebimento da designação "
+        f"e a disponibilidade em cumpri-la acessando o link abaixo:\n\n"
+        f"🔗 {link}\n\n"
+        f"Muito obrigado!"
+    )
 
 
     with st.expander("📱 Mostrar mensagem para WhatsApp"):
 
+        st.markdown("### Mensagem pronta para envio:")
+
         st.text_area(
-            "Copie a mensagem abaixo:",
-            mensagem,
-            height=220,
-            key=f"msg_{item[3]}"
+            "",
+            value=mensagem,
+            height=250,
+            key=f"whatsapp_{item[3]}"
         )
 
 
 st.divider()
 
-st.info("VERSÃO NOVA TESTE 🚀")
+st.info("VERSÃO ATUALIZADA 🚀")
