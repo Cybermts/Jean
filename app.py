@@ -7,19 +7,54 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+
+# ==========================
+# CONFIGURAÇÕES
+# ==========================
+
 st.title("📋 Gestor de Designações")
+
+
+# ==========================
+# APRESENTAÇÃO
+# ==========================
 
 st.markdown(
     """
     Bem-vindo ao **Gestor de Designações**.
 
-    Este sistema permitirá:
+    Um sistema para facilitar o controle das designações,
+    confirmações e acompanhamento das atividades.
+
+    Funcionalidades previstas:
 
     - 📅 Gerenciar designações
     - 👥 Controlar designados
+    - 🔗 Enviar links individuais de confirmação
     - ✅ Registrar confirmações
     - 📊 Acompanhar estatísticas
+    - 📱 Gerar mensagens para WhatsApp
     """
 )
 
-st.info("Projeto em desenvolvimento 🚧")
+
+st.divider()
+
+
+# ==========================
+# STATUS DO SISTEMA
+# ==========================
+
+st.success("Sistema online e funcionando! 🚀")
+
+
+st.info(
+    """
+    🚧 Próximas etapas:
+
+    - Cadastro de pessoas
+    - Criação de designações
+    - Histórico automático
+    - Relatórios
+    """
+)
