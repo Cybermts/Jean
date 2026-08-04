@@ -92,4 +92,4 @@ Muito obrigado!
 
 st.divider()
 
-st.info("Projeto em desenvolvimento 🚧")
+st.info("VERSÃO NOVA TESTE 🚀")
