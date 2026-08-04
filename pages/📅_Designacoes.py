@@ -11,27 +11,20 @@ from database.banco import conectar
 st.title("📅 Designações")
 
 
+# ==========================================================
+# GERAÇÃO DE CÓDIGO ÚNICO
+# ==========================================================
+
 def gerar_codigo():
     caracteres = string.ascii_uppercase + string.digits
     return "".join(random.choice(caracteres) for _ in range(6))
 
 
-# -------------------------------------------------------------------
-# Memória da sessão (mantém o link e a mensagem na tela)
-# -------------------------------------------------------------------
-
-if "link" not in st.session_state:
-    st.session_state.link = ""
-
-if "mensagem" not in st.session_state:
-    st.session_state.mensagem = ""
-
-
-# -------------------------------------------------------------------
+# ==========================================================
 # NOVA DESIGNAÇÃO
-# -------------------------------------------------------------------
+# ==========================================================
 
-st.subheader("Nova designação")
+st.subheader("➕ Nova designação")
 
 data = st.date_input("Data")
 
@@ -80,56 +73,17 @@ if st.button("Salvar designação"):
         conexao.commit()
         conexao.close()
 
-        data_formatada = data.strftime("%d/%m/%Y")
-
-        link = f"{URL_SISTEMA}/Responder?codigo={codigo}"
-
-        mensagem = f"""Olá, {nome}! 👋
-
-Você recebeu uma designação.
-
-📅 Data: {data_formatada}
-📝 Designação: {designacao}
-
-Por favor, confirme o recebimento da designação e a disponibilidade em cumpri-la, acessando o link a seguir:
-
-🔗 {link}
-
-Muito obrigado!
-"""
-
-        st.session_state.link = link
-        st.session_state.mensagem = mensagem
-
         st.success("✅ Designação cadastrada com sucesso!")
 
 
-# -------------------------------------------------------------------
-# LINK E MENSAGEM
-# -------------------------------------------------------------------
-
-if st.session_state.link:
-
-    st.write("### 🔗 Link de confirmação")
-
-    st.code(st.session_state.link)
-
-    st.write("### 📱 Mensagem para WhatsApp")
-
-    st.text_area(
-        "Copie e envie pelo WhatsApp:",
-        st.session_state.mensagem,
-        height=220
-    )
-
-
-# -------------------------------------------------------------------
+# ==========================================================
 # HISTÓRICO
-# -------------------------------------------------------------------
+# ==========================================================
 
 st.divider()
 
-st.subheader("Designações cadastradas")
+st.subheader("📜 Histórico de Designações")
+
 
 conexao = conectar()
 cursor = conexao.cursor()
@@ -153,30 +107,67 @@ dados = cursor.fetchall()
 conexao.close()
 
 
-for item in dados:
+if not dados:
 
-    try:
-        data_formatada = datetime.strptime(
-            item[0],
-            "%Y-%m-%d"
-        ).strftime("%d/%m/%Y")
-    except Exception:
-        data_formatada = item[0]
+    st.info("Nenhuma designação cadastrada.")
 
-    st.write(f"""
-**📅 Data:** {data_formatada}
+else:
 
-**👤 Nome:** {item[1]}
+    for item in dados:
 
-**📝 Designação:** {item[2]}
+        try:
+            data_formatada = datetime.strptime(
+                item[0],
+                "%Y-%m-%d"
+            ).strftime("%d/%m/%Y")
 
-**📩 Recebeu:** {item[4]}
+        except:
+            data_formatada = item[0]
 
-**✅ Disponibilidade:** {item[5]}
-""")
 
-    st.code(
-        f"{URL_SISTEMA}/Responder?codigo={item[3]}"
-    )
+        link = f"{URL_SISTEMA}/Responder?codigo={item[3]}"
 
-    st.divider()
+
+        st.write(
+            f"""
+            **📅 Data:** {data_formatada}
+
+            **👤 Nome:** {item[1]}
+
+            **📝 Designação:** {item[2]}
+
+            **📩 Recebeu:** {item[4]}
+
+            **✅ Disponibilidade:** {item[5]}
+            """
+        )
+
+
+        st.write("🔗 Link de confirmação:")
+
+        st.code(link)
+
+
+        mensagem = (
+            f"Olá, {item[1]}! 👋\n\n"
+            f"Você recebeu uma designação.\n\n"
+            f"📅 Data: {data_formatada}\n"
+            f"📝 Designação: {item[2]}\n\n"
+            f"Por favor, confirme o recebimento da designação "
+            f"e a disponibilidade em cumpri-la acessando o link abaixo:\n\n"
+            f"🔗 {link}\n\n"
+            f"Muito obrigado!"
+        )
+
+
+        with st.expander("📱 Mostrar mensagem para WhatsApp"):
+
+            st.text_area(
+                "Copie a mensagem abaixo:",
+                mensagem,
+                height=220,
+                key=f"whatsapp_{item[3]}"
+            )
+
+
+        st.divider()
