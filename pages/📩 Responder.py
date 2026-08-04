@@ -1,30 +1,29 @@
 import streamlit as st
 from database.banco import conectar
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+
+st.set_page_config(
+    page_title="Confirmação de Designação",
+    page_icon="📩"
+)
 
 
 st.title("📩 Confirmação de Designação")
 
 
 parametros = st.query_params
-
 codigo = parametros.get("codigo")
 
 
 if not codigo:
-
-    st.warning(
-        "Link de confirmação inválido."
-    )
-
+    st.warning("Link de confirmação inválido.")
     st.stop()
-
 
 
 conexao = conectar()
 cursor = conexao.cursor()
-
-
 
 cursor.execute(
     """
@@ -42,21 +41,14 @@ cursor.execute(
     (codigo,)
 )
 
-
 registro = cursor.fetchone()
 
 conexao.close()
 
 
-
 if not registro:
-
-    st.error(
-        "Designação não encontrada."
-    )
-
+    st.error("Designação não encontrada.")
     st.stop()
-
 
 
 id_designacao = registro[0]
@@ -68,94 +60,58 @@ disponivel_atual = registro[5]
 respondido_em = registro[6]
 
 
-# Formata a data para o padrão brasileiro
+# Data no padrão brasileiro
 data_formatada = datetime.strptime(
     data,
     "%Y-%m-%d"
-).strftime(
-    "%d/%m/%Y"
-)
+).strftime("%d/%m/%Y")
 
 
-
-st.success(
-    f"Olá, {nome}! 👋"
-)
-
+st.success(f"Olá, {nome}! 👋")
 
 st.write(
-    "Você recebeu uma designação:"
+    "Você recebeu a seguinte designação:"
 )
 
+st.info(
+    f"""
+📅 **Data:** {data_formatada}
 
-st.write(
-    f"📅 **Data:** {data_formatada}"
+📝 **Designação:** {designacao}
+"""
 )
-
-
-st.write(
-    f"📝 **Designação:** {designacao}"
-)
-
-
 
 st.divider()
 
 
-
 if respondido_em:
 
+    st.success("Sua confirmação já foi registrada.")
 
-    st.info(
-        "Sua confirmação já foi registrada."
-    )
-
-
-    st.write(
-        f"📩 **Recebeu:** {recebeu_atual}"
-    )
-
-
-    st.write(
-        f"✅ **Disponibilidade:** {disponivel_atual}"
-    )
-
-
-    st.write(
-        f"🕒 **Respondido em:** {respondido_em}"
-    )
-
+    st.write(f"📩 **Recebeu:** {recebeu_atual}")
+    st.write(f"✅ **Disponibilidade:** {disponivel_atual}")
+    st.write(f"🕒 **Respondido em:** {respondido_em}")
 
 else:
 
-
     recebeu = st.radio(
         "Você confirma que recebeu a designação?",
-        [
-            "Sim",
-            "Não"
-        ]
+        ["Sim", "Não"]
     )
-
 
     disponivel = st.radio(
         "Você tem disponibilidade em cumpri-la?",
-        [
-            "Sim",
-            "Não"
-        ]
+        ["Sim", "Não"]
     )
 
+    if st.button("Enviar confirmação", use_container_width=True):
 
-
-    if st.button(
-        "Enviar confirmação"
-    ):
-
+        horario_brasilia = datetime.now(
+            ZoneInfo("America/Sao_Paulo")
+        ).strftime("%d/%m/%Y %H:%M")
 
         conexao = conectar()
         cursor = conexao.cursor()
-
 
         cursor.execute(
             """
@@ -169,18 +125,18 @@ else:
             (
                 recebeu,
                 disponivel,
-                datetime.now().strftime(
-                    "%d/%m/%Y %H:%M"
-                ),
+                horario_brasilia,
                 id_designacao
             )
         )
 
-
         conexao.commit()
         conexao.close()
 
-
         st.success(
-            "Obrigado! Sua resposta foi registrada."
+            "✅ Obrigado! Sua resposta foi registrada com sucesso."
         )
+
+        st.balloons()
+
+        st.rerun()
