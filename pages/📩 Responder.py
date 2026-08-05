@@ -1,114 +1,129 @@
 import streamlit as st
-from database.banco import conectar
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
-
-st.set_page_config(
-    page_title="Confirmação de Designação",
-    page_icon="📩"
-)
+from database.banco import conectar
 
 
 st.title("📩 Confirmação de Designação")
 
 
-parametros = st.query_params
-codigo = parametros.get("codigo")
+# ==========================================================
+# PEGAR CÓDIGO DO LINK
+# ==========================================================
+
+params = st.query_params
+
+codigo = params.get("codigo")
 
 
 if not codigo:
-    st.warning("Link de confirmação inválido.")
+
+    st.warning("Código de confirmação não informado.")
+
     st.stop()
 
 
-conexao = conectar()
-cursor = conexao.cursor()
+# ==========================================================
+# BUSCAR DESIGNAÇÃO
+# ==========================================================
 
-cursor.execute(
-    """
-    SELECT
-        id,
-        data,
-        nome,
-        designacao,
-        recebeu,
-        disponivel,
-        respondido_em
-    FROM designacoes
-    WHERE codigo = ?
-    """,
-    (codigo,)
-)
+try:
 
-registro = cursor.fetchone()
+    conexao = conectar()
+    cursor = conexao.cursor()
 
-conexao.close()
+    cursor.execute(
+        """
+        SELECT
+            id,
+            data,
+            nome,
+            designacao,
+            recebeu,
+            disponivel
+        FROM designacoes
+        WHERE codigo = ?
+        """,
+        (codigo,)
+    )
+
+    registro = cursor.fetchone()
+
+    conexao.close()
+
+
+except Exception as erro:
+
+    st.error("Erro ao consultar designação:")
+    st.code(str(erro))
+    st.stop()
 
 
 if not registro:
-    st.error("Designação não encontrada.")
+
+    st.error("❌ Designação não encontrada.")
+
+    st.info(
+        """
+        O código informado não existe ou a designação foi removida.
+        """
+    )
+
     st.stop()
 
+
+# ==========================================================
+# MOSTRAR DADOS
+# ==========================================================
 
 id_designacao = registro[0]
 data = registro[1]
 nome = registro[2]
 designacao = registro[3]
-recebeu_atual = registro[4]
-disponivel_atual = registro[5]
-respondido_em = registro[6]
+recebeu = registro[4]
+disponivel = registro[5]
 
 
-# Data no padrão brasileiro
-data_formatada = datetime.strptime(
-    data,
-    "%Y-%m-%d"
-).strftime("%d/%m/%Y")
+try:
+
+    data_formatada = datetime.strptime(
+        data,
+        "%Y-%m-%d"
+    ).strftime("%d/%m/%Y")
+
+except:
+
+    data_formatada = data
 
 
 st.success(f"Olá, {nome}! 👋")
 
+
 st.write(
-    "Você recebeu a seguinte designação:"
-)
-
-st.info(
     f"""
-📅 **Data:** {data_formatada}
+### 📅 Data:
+{data_formatada}
 
-📝 **Designação:** {designacao}
+### 📝 Designação:
+{designacao}
 """
 )
+
 
 st.divider()
 
 
-if respondido_em:
+# ==========================================================
+# CONFIRMAÇÃO
+# ==========================================================
 
-    st.success("Sua confirmação já foi registrada.")
+if recebeu == "Confirmado":
 
-    st.write(f"📩 **Recebeu:** {recebeu_atual}")
-    st.write(f"✅ **Disponibilidade:** {disponivel_atual}")
-    st.write(f"🕒 **Respondido em:** {respondido_em}")
+    st.success("✅ Você já confirmou o recebimento desta designação.")
 
 else:
 
-    recebeu = st.radio(
-        "Você confirma que recebeu a designação?",
-        ["Sim", "Não"]
-    )
-
-    disponivel = st.radio(
-        "Você tem disponibilidade em cumpri-la?",
-        ["Sim", "Não"]
-    )
-
-    if st.button("Enviar confirmação", use_container_width=True):
-
-        horario_brasilia = datetime.now(
-            ZoneInfo("America/Sao_Paulo")
-        ).strftime("%d/%m/%Y %H:%M")
+    if st.button("✅ Confirmar recebimento"):
 
         conexao = conectar()
         cursor = conexao.cursor()
@@ -116,16 +131,13 @@ else:
         cursor.execute(
             """
             UPDATE designacoes
-            SET
-                recebeu = ?,
-                disponivel = ?,
+            SET recebeu = ?,
                 respondido_em = ?
             WHERE id = ?
             """,
             (
-                recebeu,
-                disponivel,
-                horario_brasilia,
+                "Confirmado",
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 id_designacao
             )
         )
@@ -133,10 +145,47 @@ else:
         conexao.commit()
         conexao.close()
 
-        st.success(
-            "✅ Obrigado! Sua resposta foi registrada com sucesso."
+        st.success("Recebimento confirmado com sucesso!")
+
+
+# ==========================================================
+# DISPONIBILIDADE
+# ==========================================================
+
+st.divider()
+
+st.subheader("Disponibilidade")
+
+
+opcao = st.radio(
+    "Você está disponível para cumprir esta designação?",
+    [
+        "Aguardando",
+        "Sim",
+        "Não"
+    ],
+    index=0
+)
+
+
+if st.button("Salvar disponibilidade"):
+
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute(
+        """
+        UPDATE designacoes
+        SET disponivel = ?
+        WHERE id = ?
+        """,
+        (
+            opcao,
+            id_designacao
         )
+    )
 
-        st.balloons()
+    conexao.commit()
+    conexao.close()
 
-        st.rerun()
+    st.success("Disponibilidade registrada!")
