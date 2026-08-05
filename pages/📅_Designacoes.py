@@ -173,11 +173,8 @@ else:
             f"📅 Data: {data_formatada}\n"
             f"📝 Designação: {item[2]}\n\n"
             f"Por favor, confirme o recebimento da designação "
-            f"e informe sua disponibilidade em cumpri-la através do link abaixo:\n\n"
+            f"e informe sua disponibilidade em cumpri-la acessando o link abaixo:\n\n"
             f"🔗 {link}\n\n"
-            f"Ao acessar o link, selecione uma das opções:\n\n"
-            f"✅ Sim — recebi a designação e estou disponível.\n"
-            f"❌ Não — não poderei cumprir a designação.\n\n"
             f"Muito obrigado!"
         )
 
@@ -193,3 +190,4 @@ else:
 
 
         st.divider()
+
