@@ -40,40 +40,45 @@ if st.button("Salvar designação"):
 
     else:
 
-        codigo = gerar_codigo()
+        try:
+            codigo = gerar_codigo()
 
-        conexao = conectar()
-        cursor = conexao.cursor()
+            conexao = conectar()
+            cursor = conexao.cursor()
 
-        cursor.execute(
-            """
-            INSERT INTO designacoes
-            (
-                data,
-                nome,
-                designacao,
-                codigo,
-                recebeu,
-                disponivel,
-                respondido_em
+            cursor.execute(
+                """
+                INSERT INTO designacoes
+                (
+                    data,
+                    nome,
+                    designacao,
+                    codigo,
+                    recebeu,
+                    disponivel,
+                    respondido_em
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    str(data),
+                    nome,
+                    designacao,
+                    codigo,
+                    "Aguardando",
+                    "Aguardando",
+                    None
+                )
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                str(data),
-                nome,
-                designacao,
-                codigo,
-                "Aguardando",
-                "Aguardando",
-                None
-            )
-        )
 
-        conexao.commit()
-        conexao.close()
+            conexao.commit()
+            conexao.close()
 
-        st.success("✅ Designação cadastrada com sucesso!")
+            st.success("✅ Designação cadastrada com sucesso!")
+
+        except Exception as erro:
+            st.error("Erro ao salvar designação:")
+            st.code(str(erro))
 
 
 # ==========================================================
@@ -85,26 +90,35 @@ st.divider()
 st.subheader("📜 Histórico de Designações")
 
 
-conexao = conectar()
-cursor = conexao.cursor()
+try:
 
-cursor.execute(
-    """
-    SELECT
-        data,
-        nome,
-        designacao,
-        codigo,
-        recebeu,
-        disponivel
-    FROM designacoes
-    ORDER BY data
-    """
-)
+    conexao = conectar()
+    cursor = conexao.cursor()
 
-dados = cursor.fetchall()
+    cursor.execute(
+        """
+        SELECT
+            data,
+            nome,
+            designacao,
+            codigo,
+            recebeu,
+            disponivel
+        FROM designacoes
+        ORDER BY data
+        """
+    )
 
-conexao.close()
+    dados = cursor.fetchall()
+
+    conexao.close()
+
+
+except Exception as erro:
+
+    st.error("Erro ao carregar histórico:")
+    st.code(str(erro))
+    dados = []
 
 
 if not dados:
