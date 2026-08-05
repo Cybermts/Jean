@@ -1,5 +1,6 @@
 import streamlit as st
 
+st.write("VERSÃO DE TESTE - 05/08/2026")
 st.set_page_config(
     page_title="Gestor de Designações",
     page_icon="📋",
