@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 from datetime import datetime
 
@@ -181,4 +180,4 @@ if st.button("Enviar resposta"):
 
     st.success("✅ Resposta enviada com sucesso!")
 
-```
+
