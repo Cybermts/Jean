@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 from datetime import datetime
 
@@ -73,7 +74,7 @@ if not registro:
 
 
 # ==========================================================
-# MOSTRAR DADOS
+# DADOS DA DESIGNAÇÃO
 # ==========================================================
 
 id_designacao = registro[0]
@@ -114,61 +115,46 @@ st.divider()
 
 
 # ==========================================================
-# CONFIRMAÇÃO
+# RESPOSTAS
 # ==========================================================
 
-if recebeu == "Confirmado":
-
-    st.success("✅ Você já confirmou o recebimento desta designação.")
-
-else:
-
-    if st.button("✅ Confirmar recebimento"):
-
-        conexao = conectar()
-        cursor = conexao.cursor()
-
-        cursor.execute(
-            """
-            UPDATE designacoes
-            SET recebeu = ?,
-                respondido_em = ?
-            WHERE id = ?
-            """,
-            (
-                "Confirmado",
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                id_designacao
-            )
-        )
-
-        conexao.commit()
-        conexao.close()
-
-        st.success("Recebimento confirmado com sucesso!")
+st.subheader("📩 Confirmação da designação")
 
 
-# ==========================================================
-# DISPONIBILIDADE
-# ==========================================================
-
-st.divider()
-
-st.subheader("Disponibilidade")
-
-
-opcao = st.radio(
-    "Você está disponível para cumprir esta designação?",
+confirmacao = st.radio(
+    "Você recebeu a designação?",
     [
-        "Aguardando",
         "Sim",
         "Não"
     ],
-    index=0
+    horizontal=True
 )
 
 
-if st.button("Salvar disponibilidade"):
+st.divider()
+
+
+st.subheader("✅ Disponibilidade")
+
+
+disponibilidade = st.radio(
+    "Você está disponível para cumprir esta designação?",
+    [
+        "Sim",
+        "Não"
+    ],
+    horizontal=True
+)
+
+
+st.divider()
+
+
+# ==========================================================
+# SALVAR RESPOSTAS
+# ==========================================================
+
+if st.button("Enviar resposta"):
 
     conexao = conectar()
     cursor = conexao.cursor()
@@ -176,11 +162,15 @@ if st.button("Salvar disponibilidade"):
     cursor.execute(
         """
         UPDATE designacoes
-        SET disponivel = ?
+        SET recebeu = ?,
+            disponivel = ?,
+            respondido_em = ?
         WHERE id = ?
         """,
         (
-            opcao,
+            confirmacao,
+            disponibilidade,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             id_designacao
         )
     )
@@ -188,4 +178,7 @@ if st.button("Salvar disponibilidade"):
     conexao.commit()
     conexao.close()
 
-    st.success("Disponibilidade registrada!")
+
+    st.success("✅ Resposta enviada com sucesso!")
+
+```
