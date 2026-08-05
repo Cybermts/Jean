@@ -1,3 +1,4 @@
+```python
 import random
 import string
 from datetime import datetime
@@ -41,6 +42,7 @@ if st.button("Salvar designação"):
     else:
 
         try:
+
             codigo = gerar_codigo()
 
             conexao = conectar()
@@ -77,6 +79,7 @@ if st.button("Salvar designação"):
             st.success("✅ Designação cadastrada com sucesso!")
 
         except Exception as erro:
+
             st.error("Erro ao salvar designação:")
             st.code(str(erro))
 
@@ -130,12 +133,14 @@ else:
     for item in dados:
 
         try:
+
             data_formatada = datetime.strptime(
                 item[0],
                 "%Y-%m-%d"
             ).strftime("%d/%m/%Y")
 
         except:
+
             data_formatada = item[0]
 
 
@@ -163,13 +168,17 @@ else:
 
 
         mensagem = (
+            f"*🔗 LINK CORRIGIDO*\n\n"
             f"Olá, {item[1]}! 👋\n\n"
             f"Você recebeu uma designação.\n\n"
             f"📅 Data: {data_formatada}\n"
             f"📝 Designação: {item[2]}\n\n"
             f"Por favor, confirme o recebimento da designação "
-            f"e a disponibilidade em cumpri-la acessando o link abaixo:\n\n"
+            f"e informe sua disponibilidade em cumpri-la através do link abaixo:\n\n"
             f"🔗 {link}\n\n"
+            f"Ao acessar o link, selecione uma das opções:\n\n"
+            f"✅ Sim — recebi a designação e estou disponível.\n"
+            f"❌ Não — não poderei cumprir a designação.\n\n"
             f"Muito obrigado!"
         )
 
@@ -179,9 +188,10 @@ else:
             st.text_area(
                 "Copie a mensagem abaixo:",
                 mensagem,
-                height=220,
+                height=260,
                 key=f"whatsapp_{item[3]}"
             )
 
 
         st.divider()
+```
