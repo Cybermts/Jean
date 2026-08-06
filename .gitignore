@@ -5,3 +5,7 @@ __pycache__/
 *.pyc
 
 database/sistema.db
+
+.env
+
+migrar_sqlite_para_postgres.py
