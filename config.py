@@ -1,1 +1,1 @@
-URL_SISTEMA = "https://jean93.streamlit.app"
+URL_SISTEMA = "http://localhost:8501"

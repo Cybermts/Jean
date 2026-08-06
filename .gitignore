@@ -8,4 +8,6 @@ database/sistema.db
 
 .env
 
+teste_banco.py
+
 migrar_sqlite_para_postgres.py

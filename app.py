@@ -1,61 +1,47 @@
 import streamlit as st
 
-st.write("VERSÃO DE TESTE - 05/08/2026")
+
 st.set_page_config(
     page_title="Gestor de Designações",
     page_icon="📋",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
 
-# ==========================
-# CONFIGURAÇÕES
-# ==========================
+paginas = {
 
-st.title("📋 Gestor de Designações")
+    "📋 Administração": [
 
+        st.Page(
+            "admin/📅_Designacoes.py",
+            title="📅 Designações"
+        ),
 
-# ==========================
-# APRESENTAÇÃO
-# ==========================
+        st.Page(
+            "admin/🏠_Dashboard.py",
+            title="🏠 Dashboard"
+        ),
 
-st.markdown(
-    """
-    Bem-vindo ao **Gestor de Designações**.
+        st.Page(
+            "admin/📊_Relatorios.py",
+            title="📊 Relatórios"
+        ),
 
-    Um sistema para facilitar o controle das designações,
-    confirmações e acompanhamento das atividades.
+    ],
 
-    Funcionalidades previstas:
+    "📩 Público": [
 
-    - 📅 Gerenciar designações
-    - 👥 Controlar designados
-    - 🔗 Enviar links individuais de confirmação
-    - ✅ Registrar confirmações
-    - 📊 Acompanhar estatísticas
-    - 📱 Gerar mensagens para WhatsApp
-    """
-)
+        st.Page(
+            "pages/📩 Responder.py",
+            title="📩 Responder"
+        )
 
+    ]
 
-st.divider()
-
-
-# ==========================
-# STATUS DO SISTEMA
-# ==========================
-
-st.success("Sistema online e funcionando! 🚀")
+}
 
 
-st.info(
-    """
-    🚧 Próximas etapas:
+pg = st.navigation(paginas)
 
-    - Cadastro de pessoas
-    - Criação de designações
-    - Histórico automático
-    - Relatórios
-    """
-)
+
+pg.run()

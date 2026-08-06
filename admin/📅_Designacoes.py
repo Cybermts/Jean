@@ -16,8 +16,13 @@ st.title("📅 Designações")
 # ==========================================================
 
 def gerar_codigo():
+
     caracteres = string.ascii_uppercase + string.digits
-    return "".join(random.choice(caracteres) for _ in range(6))
+
+    return "".join(
+        random.choice(caracteres)
+        for _ in range(6)
+    )
 
 
 # ==========================================================
@@ -25,6 +30,7 @@ def gerar_codigo():
 # ==========================================================
 
 st.subheader("➕ Nova designação")
+
 
 data = st.date_input("Data")
 
@@ -36,7 +42,10 @@ designacao = st.text_input("Designação")
 if st.button("Salvar designação"):
 
     if not nome or not designacao:
-        st.warning("Preencha o nome e a designação.")
+
+        st.warning(
+            "Preencha o nome e a designação."
+        )
 
     else:
 
@@ -46,6 +55,7 @@ if st.button("Salvar designação"):
 
             conexao = conectar()
             cursor = conexao.cursor()
+
 
             cursor.execute(
                 """
@@ -59,7 +69,8 @@ if st.button("Salvar designação"):
                     disponivel,
                     respondido_em
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES
+                (%s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     str(data),
@@ -72,14 +83,23 @@ if st.button("Salvar designação"):
                 )
             )
 
+
             conexao.commit()
+
             conexao.close()
 
-            st.success("✅ Designação cadastrada com sucesso!")
+
+            st.success(
+                "✅ Designação cadastrada com sucesso!"
+            )
+
 
         except Exception as erro:
 
-            st.error("Erro ao salvar designação:")
+            st.error(
+                "Erro ao salvar designação:"
+            )
+
             st.code(str(erro))
 
 
@@ -89,13 +109,17 @@ if st.button("Salvar designação"):
 
 st.divider()
 
-st.subheader("📜 Histórico de Designações")
+
+st.subheader(
+    "📜 Histórico de Designações"
+)
 
 
 try:
 
     conexao = conectar()
     cursor = conexao.cursor()
+
 
     cursor.execute(
         """
@@ -111,6 +135,7 @@ try:
         """
     )
 
+
     dados = cursor.fetchall()
 
     conexao.close()
@@ -118,68 +143,87 @@ try:
 
 except Exception as erro:
 
-    st.error("Erro ao carregar histórico:")
+    st.error(
+        "Erro ao carregar histórico:"
+    )
+
     st.code(str(erro))
+
     dados = []
+
 
 
 if not dados:
 
-    st.info("Nenhuma designação cadastrada.")
+    st.info(
+        "Nenhuma designação cadastrada."
+    )
+
 
 else:
 
     for item in dados:
 
+
         try:
 
             data_formatada = datetime.strptime(
-                item[0],
+                str(item[0]),
                 "%Y-%m-%d"
             ).strftime("%d/%m/%Y")
+
 
         except:
 
             data_formatada = item[0]
 
 
-        link = f"{URL_SISTEMA}/Responder?codigo={item[3]}"
+
+        link = (
+            f"{URL_SISTEMA}/Responder"
+            f"?codigo={item[3]}"
+        )
 
 
         st.write(
             f"""
-            **📅 Data:** {data_formatada}
+**📅 Data:** {data_formatada}
 
-            **👤 Nome:** {item[1]}
+**👤 Nome:** {item[1]}
 
-            **📝 Designação:** {item[2]}
+**📝 Designação:** {item[2]}
 
-            **📩 Recebeu:** {item[4]}
+**📩 Recebeu:** {item[4]}
 
-            **✅ Disponibilidade:** {item[5]}
-            """
+**✅ Disponibilidade:** {item[5]}
+"""
         )
 
 
-        st.write("🔗 Link de confirmação:")
+        st.write(
+            "🔗 Link de confirmação:"
+        )
 
         st.code(link)
 
 
+
         mensagem = (
-            f"*🔗 LINK CORRIGIDO*\n\n"
             f"Olá, {item[1]}! 👋\n\n"
             f"Você recebeu uma designação.\n\n"
             f"📅 Data: {data_formatada}\n"
             f"📝 Designação: {item[2]}\n\n"
-            f"Por favor, confirme o recebimento da designação "
-            f"e informe sua disponibilidade em cumpri-la acessando o link abaixo:\n\n"
+            f"Por favor, confirme o recebimento "
+            f"da designação e informe sua disponibilidade "
+            f"acessando o link abaixo:\n\n"
             f"🔗 {link}\n\n"
             f"Muito obrigado!"
         )
 
 
-        with st.expander("📱 Mostrar mensagem para WhatsApp"):
+        with st.expander(
+            "📱 Mostrar mensagem para WhatsApp"
+        ):
 
             st.text_area(
                 "Copie a mensagem abaixo:",
@@ -190,4 +234,3 @@ else:
 
 
         st.divider()
-

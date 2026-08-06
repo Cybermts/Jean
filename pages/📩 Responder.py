@@ -4,6 +4,13 @@ from datetime import datetime
 from database.banco import conectar
 
 
+st.set_page_config(
+    page_title="Confirmação de Designação",
+    page_icon="📩",
+    initial_sidebar_state="collapsed"
+)
+
+
 st.title("📩 Confirmação de Designação")
 
 
@@ -18,9 +25,12 @@ codigo = params.get("codigo")
 
 if not codigo:
 
-    st.warning("Código de confirmação não informado.")
+    st.warning(
+        "Código de confirmação não informado."
+    )
 
     st.stop()
+
 
 
 # ==========================================================
@@ -40,9 +50,10 @@ try:
             nome,
             designacao,
             recebeu,
-            disponivel
+            disponivel,
+            respondido_em
         FROM designacoes
-        WHERE codigo = ?
+        WHERE codigo = %s
         """,
         (codigo,)
     )
@@ -54,14 +65,21 @@ try:
 
 except Exception as erro:
 
-    st.error("Erro ao consultar designação:")
+    st.error(
+        "Erro ao consultar designação:"
+    )
+
     st.code(str(erro))
+
     st.stop()
+
 
 
 if not registro:
 
-    st.error("❌ Designação não encontrada.")
+    st.error(
+        "❌ Designação não encontrada."
+    )
 
     st.info(
         """
@@ -72,6 +90,7 @@ if not registro:
     st.stop()
 
 
+
 # ==========================================================
 # DADOS DA DESIGNAÇÃO
 # ==========================================================
@@ -80,23 +99,33 @@ id_designacao = registro[0]
 data = registro[1]
 nome = registro[2]
 designacao = registro[3]
-recebeu = registro[4]
-disponivel = registro[5]
+recebeu_atual = registro[4]
+disponivel_atual = registro[5]
+respondido_em = registro[6]
+
 
 
 try:
 
     data_formatada = datetime.strptime(
-        data,
+        str(data),
         "%Y-%m-%d"
     ).strftime("%d/%m/%Y")
+
 
 except:
 
     data_formatada = data
 
 
-st.success(f"Olá, {nome}! 👋")
+
+# ==========================================================
+# CABEÇALHO
+# ==========================================================
+
+st.success(
+    f"Olá, {nome}! 👋"
+)
 
 
 st.write(
@@ -113,11 +142,40 @@ st.write(
 st.divider()
 
 
+
 # ==========================================================
-# RESPOSTAS
+# CASO JÁ TENHA RESPONDIDO
 # ==========================================================
 
-st.subheader("📩 Confirmação da designação")
+if respondido_em:
+
+    st.success(
+        "🎉 Sua confirmação já foi registrada!"
+    )
+
+    st.info(
+        f"""
+Obrigado pela sua resposta, {nome}! 🙏
+
+📩 **Recebimento:** {recebeu_atual}
+
+✅ **Disponibilidade:** {disponivel_atual}
+
+🕒 **Respondido em:** {respondido_em}
+"""
+    )
+
+    st.stop()
+
+
+
+# ==========================================================
+# FORMULÁRIO DE RESPOSTA
+# ==========================================================
+
+st.subheader(
+    "📩 Confirmação da designação"
+)
 
 
 confirmacao = st.radio(
@@ -130,10 +188,14 @@ confirmacao = st.radio(
 )
 
 
+
 st.divider()
 
 
-st.subheader("✅ Disponibilidade")
+
+st.subheader(
+    "✅ Disponibilidade"
+)
 
 
 disponibilidade = st.radio(
@@ -146,38 +208,82 @@ disponibilidade = st.radio(
 )
 
 
+
 st.divider()
+
 
 
 # ==========================================================
 # SALVAR RESPOSTAS
 # ==========================================================
 
-if st.button("Enviar resposta"):
+if st.button(
+    "Enviar resposta",
+    use_container_width=True
+):
 
-    conexao = conectar()
-    cursor = conexao.cursor()
+    try:
 
-    cursor.execute(
-        """
-        UPDATE designacoes
-        SET recebeu = ?,
-            disponivel = ?,
-            respondido_em = ?
-        WHERE id = ?
-        """,
-        (
-            confirmacao,
-            disponibilidade,
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            id_designacao
+        conexao = conectar()
+        cursor = conexao.cursor()
+
+
+        horario = datetime.now().strftime(
+            "%d/%m/%Y %H:%M"
         )
-    )
-
-    conexao.commit()
-    conexao.close()
 
 
-    st.success("✅ Resposta enviada com sucesso!")
+        cursor.execute(
+            """
+            UPDATE designacoes
+            SET
+                recebeu = %s,
+                disponivel = %s,
+                respondido_em = %s
+            WHERE id = %s
+            """,
+            (
+                confirmacao,
+                disponibilidade,
+                horario,
+                id_designacao
+            )
+        )
 
 
+        conexao.commit()
+
+        conexao.close()
+
+
+
+        st.success(
+            f"🎉 Obrigado, {nome}! "
+            "Sua confirmação foi registrada com sucesso."
+        )
+
+
+        st.balloons()
+
+
+
+        st.info(
+            """
+Sua resposta foi enviada ao responsável pelas designações.
+
+Muito obrigado pela colaboração! 🙏
+"""
+        )
+
+
+        st.stop()
+
+
+
+    except Exception as erro:
+
+        st.error(
+            "Erro ao salvar resposta:"
+        )
+
+        st.code(str(erro))
