@@ -1,5 +1,10 @@
+```python
 import streamlit as st
 
+
+# ==========================================================
+# CONFIGURAÇÃO
+# ==========================================================
 
 st.set_page_config(
     page_title="Gestor de Designações",
@@ -8,40 +13,64 @@ st.set_page_config(
 )
 
 
-paginas = {
+# ==========================================================
+# VERIFICAR SE É UM ACESSO PÚBLICO
+# ==========================================================
 
-    "📋 Administração": [
+params = st.query_params
 
-        st.Page(
-            "admin/📅_Designacoes.py",
-            title="📅 Designações"
-        ),
+codigo = params.get("codigo")
 
-        st.Page(
-            "admin/🏠_Dashboard.py",
-            title="🏠 Dashboard"
-        ),
 
-        st.Page(
-            "admin/📊_Relatorios.py",
-            title="📊 Relatórios"
-        ),
+# ==========================================================
+# ACESSO PÚBLICO
+# ==========================================================
 
-    ],
+if codigo:
 
-    "📩 Público": [
-
+    paginas = [
         st.Page(
             "pages/📩 Responder.py",
             title="📩 Responder"
         )
-
     ]
 
-}
 
+# ==========================================================
+# ACESSO ADMINISTRATIVO
+# ==========================================================
+
+else:
+
+    paginas = {
+
+        "📋 Administração": [
+
+            st.Page(
+                "admin/📅_Designacoes.py",
+                title="📅 Designações"
+            ),
+
+            st.Page(
+                "admin/🏠_Dashboard.py",
+                title="🏠 Dashboard"
+            ),
+
+            st.Page(
+                "admin/📊_Relatorios.py",
+                title="📊 Relatórios"
+            ),
+
+        ]
+
+    }
+
+
+# ==========================================================
+# NAVEGAÇÃO
+# ==========================================================
 
 pg = st.navigation(paginas)
 
-
 pg.run()
+```

@@ -4,14 +4,15 @@ from datetime import datetime
 from database.banco import conectar
 
 
+# ==========================================================
+# CONFIGURAÇÃO
+# ==========================================================
+
 st.set_page_config(
     page_title="Confirmação de Designação",
     page_icon="📩",
     initial_sidebar_state="collapsed"
 )
-
-
-st.title("📩 Confirmação de Designação")
 
 
 # ==========================================================
@@ -30,7 +31,6 @@ if not codigo:
     )
 
     st.stop()
-
 
 
 # ==========================================================
@@ -66,7 +66,7 @@ try:
 except Exception as erro:
 
     st.error(
-        "Erro ao consultar designação:"
+        "Erro ao consultar a designação."
     )
 
     st.code(str(erro))
@@ -74,6 +74,9 @@ except Exception as erro:
     st.stop()
 
 
+# ==========================================================
+# VERIFICAR SE ENCONTROU
+# ==========================================================
 
 if not registro:
 
@@ -82,13 +85,10 @@ if not registro:
     )
 
     st.info(
-        """
-        O código informado não existe ou a designação foi removida.
-        """
+        "O código informado não existe ou a designação foi removida."
     )
 
     st.stop()
-
 
 
 # ==========================================================
@@ -104,6 +104,9 @@ disponivel_atual = registro[5]
 respondido_em = registro[6]
 
 
+# ==========================================================
+# FORMATAR DATA
+# ==========================================================
 
 try:
 
@@ -112,16 +115,16 @@ try:
         "%Y-%m-%d"
     ).strftime("%d/%m/%Y")
 
-
 except:
 
-    data_formatada = data
-
+    data_formatada = str(data)
 
 
 # ==========================================================
 # CABEÇALHO
 # ==========================================================
+
+st.title("📩 Confirmação de Designação")
 
 st.success(
     f"Olá, {nome}! 👋"
@@ -130,17 +133,17 @@ st.success(
 
 st.write(
     f"""
-### 📅 Data:
-{data_formatada}
+### 📅 Data
 
-### 📝 Designação:
-{designacao}
+**{data_formatada}**
+
+### 📝 Designação
+
+**{designacao}**
 """
 )
 
-
 st.divider()
-
 
 
 # ==========================================================
@@ -168,70 +171,69 @@ Obrigado pela sua resposta, {nome}! 🙏
     st.stop()
 
 
-
 # ==========================================================
-# FORMULÁRIO DE RESPOSTA
+# FORMULÁRIO
 # ==========================================================
 
 st.subheader(
-    "📩 Confirmação da designação"
+    "Você poderá cumprir esta designação?"
 )
 
-
-confirmacao = st.radio(
-    "Você recebeu a designação?",
+resposta = st.radio(
+    "Selecione uma opção:",
     [
-        "Sim",
-        "Não"
+        "Sim — recebi a designação e estou disponível.",
+        "Não — não poderei cumprir a designação."
     ],
-    horizontal=True
+    index=None
 )
-
-
-
-st.divider()
-
-
-
-st.subheader(
-    "✅ Disponibilidade"
-)
-
-
-disponibilidade = st.radio(
-    "Você está disponível para cumprir esta designação?",
-    [
-        "Sim",
-        "Não"
-    ],
-    horizontal=True
-)
-
-
-
-st.divider()
-
 
 
 # ==========================================================
-# SALVAR RESPOSTAS
+# ENVIAR RESPOSTA
 # ==========================================================
 
 if st.button(
-    "Enviar resposta",
+    "📩 Enviar resposta",
     use_container_width=True
 ):
+
+    if resposta is None:
+
+        st.warning(
+            "Por favor, selecione uma opção antes de enviar."
+        )
+
+        st.stop()
+
+
+    # ------------------------------------------------------
+    # TRANSFORMAR A RESPOSTA EM DADOS DO BANCO
+    # ------------------------------------------------------
+
+    if resposta.startswith("Sim"):
+
+        recebeu = "Sim"
+        disponivel = "Sim"
+
+    else:
+
+        recebeu = "Sim"
+        disponivel = "Não"
+
+
+    # ------------------------------------------------------
+    # SALVAR
+    # ------------------------------------------------------
 
     try:
 
         conexao = conectar()
         cursor = conexao.cursor()
 
-
         horario = datetime.now().strftime(
             "%d/%m/%Y %H:%M"
         )
-
 
         cursor.execute(
             """
@@ -243,29 +245,28 @@ if st.button(
             WHERE id = %s
             """,
             (
-                confirmacao,
-                disponibilidade,
+                recebeu,
+                disponivel,
                 horario,
                 id_designacao
             )
         )
-
 
         conexao.commit()
 
         conexao.close()
 
 
+        # --------------------------------------------------
+        # CONFIRMAÇÃO
+        # --------------------------------------------------
 
         st.success(
             f"🎉 Obrigado, {nome}! "
-            "Sua confirmação foi registrada com sucesso."
+            "Sua resposta foi registrada com sucesso."
         )
 
-
         st.balloons()
-
-
 
         st.info(
             """
@@ -275,15 +276,13 @@ Muito obrigado pela colaboração! 🙏
 """
         )
 
-
         st.stop()
-
 
 
     except Exception as erro:
 
         st.error(
-            "Erro ao salvar resposta:"
+            "Erro ao salvar resposta."
         )
 
         st.code(str(erro))
