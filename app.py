@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 
 
@@ -73,4 +73,3 @@ else:
 pg = st.navigation(paginas)
 
 pg.run()
-```
