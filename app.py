@@ -1,17 +1,14 @@
-
 import streamlit as st
-
 
 # ==========================================================
 # CONFIGURAÇÃO
 # ==========================================================
 
 st.set_page_config(
-    page_title="Gestor de Designações",
-    page_icon="📋",
+    page_title="FAÇA SEU MELHOR NO MINISTÉRIO",
+    page_icon="📖",
     layout="wide"
 )
-
 
 # ==========================================================
 # VERIFICAR SE É UM ACESSO PÚBLICO
@@ -20,7 +17,6 @@ st.set_page_config(
 params = st.query_params
 
 codigo = params.get("codigo")
-
 
 # ==========================================================
 # ACESSO PÚBLICO
@@ -34,7 +30,6 @@ if codigo:
             title="📩 Responder"
         )
     ]
-
 
 # ==========================================================
 # ACESSO ADMINISTRATIVO
@@ -65,7 +60,6 @@ else:
 
     }
 
-
 # ==========================================================
 # NAVEGAÇÃO
 # ==========================================================
@@ -73,3 +67,4 @@ else:
 pg = st.navigation(paginas)
 
 pg.run()
+
