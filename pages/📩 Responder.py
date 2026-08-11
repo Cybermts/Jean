@@ -105,6 +105,13 @@ respondido_em = registro[6]
 
 
 # ==========================================================
+# LIMPAR ASTERISCOS DA DESIGNAÇÃO
+# ==========================================================
+
+designacao = str(designacao).replace("*", "").strip()
+
+
+# ==========================================================
 # FORMATAR DATA
 # ==========================================================
 
@@ -114,6 +121,7 @@ try:
         str(data),
         "%Y-%m-%d"
     ).strftime("%d/%m/%Y")
+
 
 except:
 
@@ -130,7 +138,6 @@ st.success(
     f"Olá, {nome}! 👋"
 )
 
-
 st.write(
     f"""
 ### 📅 Data
@@ -139,7 +146,7 @@ st.write(
 
 ### 📝 Designação
 
-**{designacao}**
+{designacao}
 """
 )
 
@@ -286,3 +293,4 @@ Muito obrigado pela colaboração! 🙏
         )
 
         st.code(str(erro))
+
