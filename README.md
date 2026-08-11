@@ -1,11 +1,11 @@
-# Designação Vida e Ministério
+# FAÇA SEU MELHOR NO MINISTÉRIO
 
-Faça seu melhor no ministério
+Reunião Vida e Ministério
 
 ## Recursos
 
-- Cadastro de designações
-- Confirmação por link individual
-- Integração com Google Sheets
-- Painel administrativo
-- Histórico de confirmações
+* Cadastro de designações
+* Confirmação por link individual
+* Integração com Google Sheets
+* Painel administrativo
+* Histórico de confirmações
