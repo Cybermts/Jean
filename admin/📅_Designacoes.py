@@ -1,3 +1,4 @@
+
 import random
 import string
 from datetime import datetime
@@ -109,7 +110,6 @@ if st.button("Salvar designação"):
 
 st.divider()
 
-
 st.subheader(
     "📜 Histórico de Designações"
 )
@@ -152,18 +152,15 @@ except Exception as erro:
     dados = []
 
 
-
 if not dados:
 
     st.info(
         "Nenhuma designação cadastrada."
     )
 
-
 else:
 
     for item in dados:
-
 
         try:
 
@@ -178,9 +175,12 @@ else:
             data_formatada = item[0]
 
 
+        # ==================================================
+        # LINK DE CONFIRMAÇÃO
+        # ==================================================
 
         link = (
-            f"{URL_SISTEMA}/Responder"
+            f"{URL_SISTEMA}/"
             f"?codigo={item[3]}"
         )
 
@@ -207,6 +207,9 @@ else:
         st.code(link)
 
 
+        # ==================================================
+        # MENSAGEM PARA WHATSAPP
+        # ==================================================
 
         mensagem = (
             f"Olá, {item[1]}! 👋\n\n"
@@ -234,3 +237,4 @@ else:
 
 
         st.divider()
+
