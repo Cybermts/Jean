@@ -1,6 +1,6 @@
-# Gestor de Designações
+# Designação Vida e Ministério
 
-Sistema desenvolvido em Streamlit para gerenciamento de designações.
+Faça seu melhor no ministério
 
 ## Recursos
 
